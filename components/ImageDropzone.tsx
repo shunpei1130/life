@@ -64,7 +64,7 @@ export function ImageDropzone({ onFileSelected, disabled, fileName }: ImageDropz
         />
       </svg>
       <div className="space-y-1">
-        <p className="text-lg font-semibold">画像を選択またはここにドロップ</p>
+        <p className="text-lg font-semibold">画像をここにドロップ</p>
         <p className="text-sm text-slate-300">JPG / PNG / WebP ・長辺 4096px 以内</p>
         {fileName && <p className="text-sm text-primary-200">選択中: {fileName}</p>}
       </div>
