@@ -1,0 +1,14 @@
+{
+  "app_title": "抽象画像編集アプリ",
+  "upload_instructions": "画像を選択またはここにドロップ",
+  "upload_hint": "JPG / PNG / WebP ・長辺 4096px 以内",
+  "next": "次へ",
+  "send": "送信",
+  "prompt_placeholder": "例：背景を海に。服は黒のジャケットに。人物の雰囲気はそのまま。",
+  "processing": "画像を生成中です…",
+  "download_png": "PNGでダウンロード",
+  "download_jpeg": "JPEGでダウンロード",
+  "copy": "クリップボードにコピー",
+  "reedit": "再編集",
+  "reset": "やり直す"
+}
