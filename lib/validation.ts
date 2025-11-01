@@ -1,9 +1,9 @@
-const bannedWords = ['禁止語'];
+const bannedWords = ['制約'];
 
 export function validatePrompt(prompt: string) {
   const trimmed = prompt.trim();
-  if (trimmed.length < 8) {
-    return '指示は8文字以上で入力してください。';
+  if (trimmed.length < 3) {
+    return '指示は3文字以上で入力してください。';
   }
 
   if (trimmed.length > 2000) {

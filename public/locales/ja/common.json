@@ -4,7 +4,7 @@
   "upload_hint": "JPG / PNG / WebP ・長辺 4096px 以内",
   "next": "次へ",
   "send": "送信",
-  "prompt_placeholder": "例：背景を海に。服は黒のジャケットに。人物の雰囲気はそのまま。",
+  "prompt_placeholder": "例：服を・・・",
   "processing": "画像を生成中です…",
   "download_png": "PNGでダウンロード",
   "download_jpeg": "JPEGでダウンロード",
