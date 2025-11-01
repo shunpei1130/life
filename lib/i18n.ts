@@ -1,4 +1,4 @@
-import ja from '@/../public/locales/ja/common.json';
+import ja from '../public/locales/ja/common.json';
 
 type Locale = 'ja';
 
