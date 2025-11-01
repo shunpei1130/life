@@ -29,7 +29,7 @@ ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "").split(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS or ["https://example.vercel.app"],
-    allow_credentials=*,            # Cookie使うならTrue + allow_originsは具体値必須
+    allow_credentials=False,            # Cookie使うならTrue + allow_originsは具体値必須
     allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["Authorization","Content-Type"]
 )
