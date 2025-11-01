@@ -6,10 +6,10 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>抽象画像編集アプリ | EternalAI</title>
+        <title>LIFE〈人物を自由に修正しよう〉</title>
         <meta
           name="description"
-          content="EternalAIと連携した抽象画像編集アプリ。人物写真をアップロードし、自然言語の指示で編集できます。"
+          content="画像編集アプリ。人物写真をアップロードし、自然言語の指示で編集できます。"
         />
       </Head>
       <Component {...pageProps} />

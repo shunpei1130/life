@@ -2,8 +2,8 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 const tips = [
-  '画像を生成中です（通常 10–40 秒ほどで完了します）。',
-  'コツ：人物を保持したい場合は「人物はそのまま」と明記すると安定します。',
+  '画像を生成中です（通常 30秒–3分 ほどで完了します）。',
+  'コツ：シンプルに指示をするとよいです。',
   'Tip：色変更や背景差し替えは具体的な単語が効果的です。'
 ];
 
@@ -74,7 +74,7 @@ export function ProcessingModal({ open, onCancel }: ProcessingModalProps) {
                   </span>
                   <div>
                     <Dialog.Title className="text-lg font-semibold text-white">画像を生成中です…</Dialog.Title>
-                    <p className="text-sm text-slate-300">通常は 10–40 秒程度で完了します。</p>
+                    <p className="text-sm text-slate-300">通常は 30秒–3分 程度で完了します。</p>
                   </div>
                 </div>
                 <div className="mt-6 rounded-xl bg-slate-800/70 p-4">

@@ -28,8 +28,8 @@ export default function Home() {
 
   const tips = useMemo(
     () => [
-      '画像を生成中です。通常は 10–40 秒ほどで完了します。',
-      'コツ：人物を保持したい場合は「人物はそのまま」と明記すると安定します。',
+      '画像を生成中です。通常は 30秒–3分 ほどで完了します。',
+      'コツ：シンプルに指示をするとよいです。',
       'Tip：色変更や背景差し替えは具体的な単語が効果的です。'
     ],
     []
@@ -145,9 +145,9 @@ export default function Home() {
       <ProcessingModal open={status === 'processing'} onCancel={cancelProcessing} />
       <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-6 py-12">
         <header className="flex flex-col gap-3 text-center">
-          <h1 className="text-3xl font-bold text-white md:text-4xl">抽象画像編集 Web アプリ</h1>
+          <h1 className="text-3xl font-bold text-white md:text-4xl">画像編集アプリ</h1>
           <p className="text-slate-300">
-            EternalAIの編集APIを使って、人物写真の背景や服装を自然言語の指示だけで編集できます。
+            人物写真を自然言語の指示だけで編集できます。
           </p>
         </header>
 
