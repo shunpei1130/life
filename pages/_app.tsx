@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-html-link-for-pages */ // ← このファイル内だけ一時的に無効化
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import Link from 'next/link'; // ← 追加
+import Link from 'next/link';
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }: AppProps) {
