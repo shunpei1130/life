@@ -59,7 +59,10 @@ async def send_edit_request(job: Job, image_base64: str) -> Optional[str]:
     if status_code in (401, 500) and not _is_production:
       print(f"Warning: External API request returned {status_code}, falling back to simulation mode")
       return await _simulate_request(job)
-    # 本番環境またはその他のエラーは再スロー
+    # 本番環境では401エラーをより分かりやすく
+    if status_code == 401 and _is_production:
+      raise ValueError("EternalAI APIキーが無効または期限切れです。APIキーを確認してください。")
+    # その他のエラーは再スロー
     raise
   except Exception as e:
     # ネットワークエラーなど
@@ -92,7 +95,10 @@ async def poll_result(request_id: str) -> dict:
     if status_code in (401, 500) and not _is_production:
       print(f"Warning: External API poll returned {status_code}, falling back to simulation mode")
       return await _simulate_poll(request_id)
-    # 本番環境またはその他のエラーは再スロー
+    # 本番環境では401エラーをより分かりやすく
+    if status_code == 401 and _is_production:
+      raise ValueError("EternalAI APIキーが無効または期限切れです。APIキーを確認してください。")
+    # その他のエラーは再スロー
     raise
   except Exception as e:
     # ネットワークエラーなど
