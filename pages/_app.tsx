@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import Link from 'next/link'; // ← 追加
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -21,18 +22,18 @@ export default function App({ Component, pageProps }: AppProps) {
 
         {/* 共通フッター */}
         <footer className="text-center text-sm text-gray-500 py-6 border-t">
-          © 2025 Life ｜{' '}
-          <a href="/tokushoho" className="underline hover:text-gray-700">
+          © 2025 LIFE ｜{' '}
+          <Link href="/tokushoho" className="underline hover:text-gray-700">
             特定商取引法に基づく表記
-          </a>{' '}
+          </Link>{' '}
           ｜{' '}
-          <a href="/terms" className="underline hover:text-gray-700">
+          <Link href="/terms" className="underline hover:text-gray-700">
             利用規約
-          </a>{' '}
+          </Link>{' '}
           ｜{' '}
-          <a href="/privacy" className="underline hover:text-gray-700">
+          <Link href="/privacy" className="underline hover:text-gray-700">
             プライバシーポリシー
-          </a>
+          </Link>
         </footer>
       </div>
     </>
