@@ -24,11 +24,12 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 app.add_middleware(BodySizeLimitMiddleware)
 
-# ---- CORS (env-driven) ----
+# ---- CORS (env-driven) ---
+DEFAULT_ORIGINS = ["https://example.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000"]
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS or ["https://example.vercel.app"],
+    allow_origins=ALLOWED_ORIGINS or DEFAULT_ORIGINS,
     allow_credentials=False,            # Cookie使うならTrue + allow_originsは具体値必須
     allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["Authorization","Content-Type"]
