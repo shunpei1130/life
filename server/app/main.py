@@ -14,7 +14,7 @@ from .eternalai import send_edit_request, poll_result
 app = FastAPI(title="EternalAI Image Editor API", version="1.0.0")
 
 # ---- Size limit (protect backend) ----
-MAX_BODY_BYTES = int(os.getenv("MAX_BODY_BYTES", str(5*1024*1024)))  # 5MB
+MAX_BODY_BYTES = int(os.getenv("MAX_BODY_BYTES", str(15*1024*1024)))  # default 15MB to accommodate base64 images
 class BodySizeLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         body = await request.body()
@@ -25,13 +25,23 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
 app.add_middleware(BodySizeLimitMiddleware)
 
 # ---- CORS (env-driven) ----
-ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "https://life-six-mu.vercel.app").split(",") if o.strip()]
+_raw_cors = os.getenv("CORS_ALLOW_ORIGINS")
+if _raw_cors and _raw_cors.strip():
+  ALLOWED_ORIGINS = [o.strip() for o in _raw_cors.split(",") if o.strip()]
+else:
+  # Sensible default for production frontend
+  ALLOWED_ORIGINS = ["https://life-six-mu.vercel.app"]
+
+# Optional regex to allow Vercel previews (can override via env)
+ALLOW_ORIGIN_REGEX = os.getenv("CORS_ALLOW_ORIGIN_REGEX", r"https://.*\.vercel\.app$")
+
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS or ["https://example.vercel.app"],
-    allow_credentials=False,            # Cookie使うならTrue + allow_originsは具体値必須
-    allow_methods=["GET","POST","OPTIONS"],
-    allow_headers=["Authorization","Content-Type"]
+  CORSMiddleware,
+  allow_origins=ALLOWED_ORIGINS,
+  allow_origin_regex=ALLOW_ORIGIN_REGEX if ALLOW_ORIGIN_REGEX else None,
+  allow_credentials=False,
+  allow_methods=["GET", "POST", "OPTIONS"],
+  allow_headers=["Authorization", "Content-Type"]
 )
 
 @app.post("/api/edit", response_model=EditResponse)
@@ -65,6 +75,7 @@ async def get_result(request_id: str = Query(..., description="EternalAI request
 
     if status == JobStatus.FAILED:
         error = response.get("error", "画像の生成に失敗しました。")
+        
         if job:
             job.mark_failure(error)
             job_store.update_job(job)
