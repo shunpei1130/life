@@ -44,6 +44,53 @@ uvicorn app.main:app --reload
 
 API キーを利用する場合は `.env` に `ETERNAL_AI_API_KEY=<your_key>` を設定します。API キーが未設定の場合、サーバーはローカル開発用のシミュレーションレスポンスを返します。
 
+## 本番環境へのデプロイ
+
+### バックエンド（必須の環境変数）
+
+本番環境では、以下の環境変数を設定してください：
+
+```bash
+# 必須
+ENVIRONMENT=production              # 本番環境であることを示す（"production" または "prod"）
+ETERNAL_AI_API_KEY=<your_key>       # 有効なEternalAI APIキー
+CORS_ALLOW_ORIGINS=https://your-frontend-domain.com  # フロントエンドのURL（カンマ区切りで複数指定可能）
+
+# オプション
+CORS_ALLOW_ORIGIN_REGEX=https://.*\.vercel\.app$    # Vercelプレビュー環境用の正規表現
+MAX_BODY_BYTES=15728640                            # リクエストボディサイズ制限（デフォルト: 15MB）
+```
+
+**重要な注意点：**
+
+1. **`ENVIRONMENT=production` の設定**
+   - 本番環境では必ず設定してください
+   - 設定しないと、localhostがCORSに追加され、シミュレーションモードにフォールバックする可能性があります
+
+2. **`ETERNAL_AI_API_KEY` の設定**
+   - 本番環境では有効なAPIキーが必須です
+   - 未設定または無効な場合、401エラーが発生します（開発環境ではシミュレーションモードにフォールバック）
+
+3. **`CORS_ALLOW_ORIGINS` の設定**
+   - フロントエンドのURLを正確に指定してください
+   - 複数のドメインを許可する場合はカンマ区切り: `https://example.com,https://www.example.com`
+
+4. **エラーハンドリング**
+   - 本番環境では、外部APIのエラー（401、500など）はシミュレーションモードにフォールバックしません
+   - エラーは適切にHTTPステータスコードとして返されます
+   - サーバーログでエラー内容を確認できます
+
+5. **セキュリティ**
+   - `.env` ファイルは絶対にGitにコミットしないでください
+   - 環境変数はデプロイプラットフォーム（Render、Heroku、AWS等）の環境変数設定で管理してください
+
+### ヘルスチェック
+
+本番環境では、以下のエンドポイントで動作確認ができます：
+
+- `GET /api/health` - サーバーの状態とAPIキーの有無を確認
+- `GET /api/debug/cors` - CORS設定を確認（デバッグ用）
+
 ## 主な機能
 
 - 画像アップロード（ドラッグ＆ドロップ対応）
