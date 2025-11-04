@@ -14,7 +14,32 @@ export type PollResponse = {
   error?: string;
 };
 
-const DEFAULT_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+function resolveBaseUrl(): string {
+  // ブラウザで localhost の場合は原則ローカルAPIを優先
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const forceRemote = (process.env.NEXT_PUBLIC_FORCE_REMOTE || '').toLowerCase();
+    const isForceRemote = forceRemote === '1' || forceRemote === 'true' || forceRemote === 'yes';
+    if ((host === 'localhost' || host === '127.0.0.1') && !isForceRemote) {
+      return 'http://localhost:8000';
+    }
+  }
+
+  // 明示設定があれば尊重（本番はここを使う）
+  if (process.env.NEXT_PUBLIC_API_BASE_URL && process.env.NEXT_PUBLIC_API_BASE_URL.trim()) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+
+  // ブラウザ: 同一オリジン（CDN/Edge配下のリバースプロキシ前提）
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}`;
+  }
+
+  // SSR時のフォールバック（開発）
+  return 'http://localhost:8000';
+}
+
+const DEFAULT_BASE_URL = resolveBaseUrl();
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
