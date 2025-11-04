@@ -25,10 +25,26 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
 app.add_middleware(BodySizeLimitMiddleware)
 
 # ---- CORS (env-driven) ----
-ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "").split(",") if o.strip()]
+DEFAULT_PRODUCTION_ORIGINS = [
+    "https://life-six-mu.vercel.app",
+    "https://example.vercel.app",
+]
+LOCAL_DEVELOPMENT_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+configured_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOW_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+allow_origins = configured_origins or DEFAULT_PRODUCTION_ORIGINS
+allow_origins = sorted({*allow_origins, *LOCAL_DEVELOPMENT_ORIGINS})
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS or ["https://example.vercel.app"],
+    allow_origins=allow_origins,
     allow_credentials=False,            # Cookie使うならTrue + allow_originsは具体値必須
     allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["Authorization","Content-Type"]
