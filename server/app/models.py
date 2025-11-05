@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -27,6 +27,45 @@ class PollResponse(BaseModel):
   request_id: Optional[str] = None
 
 
+class CheckoutSessionRequest(BaseModel):
+  price_id: str
+  quantity: int = Field(default=1, ge=1, le=100)
+
+
+class CheckoutSessionResponse(BaseModel):
+  url: str
+
+
+class MeResponse(BaseModel):
+  uid: str
+  email: Optional[str]
+  credits: int
+
+
+class ChargeLog(BaseModel):
+  id: str
+  price_id: Optional[str]
+  quantity: int
+  credits_added: int
+  amount_total_jpy: int
+  currency: str
+  created_at: datetime
+
+
+class ConsumptionLog(BaseModel):
+  id: int
+  credits_used: int
+  reason: Optional[str]
+  request_id: Optional[str]
+  refunded: bool
+  created_at: datetime
+
+
+class HistoryResponse(BaseModel):
+  charges: List[ChargeLog]
+  consumptions: List[ConsumptionLog]
+
+
 class Job(BaseModel):
   id: str
   request_id: Optional[str] = None
@@ -37,6 +76,7 @@ class Job(BaseModel):
   prompt: str
   result_url: Optional[str] = None
   error: Optional[str] = None
+  uid: Optional[str] = None
 
   def mark_success(self, result_url: str) -> None:
     self.status = JobStatus.SUCCESS

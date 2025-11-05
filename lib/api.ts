@@ -14,54 +14,113 @@ export type PollResponse = {
   error?: string;
 };
 
-function resolveBaseUrl(): string {
-  // ブラウザで localhost の場合は原則ローカルAPIを優先
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    const forceRemote = (process.env.NEXT_PUBLIC_FORCE_REMOTE || '').toLowerCase();
-    const isForceRemote = forceRemote === '1' || forceRemote === 'true' || forceRemote === 'yes';
-    if ((host === 'localhost' || host === '127.0.0.1') && !isForceRemote) {
-      return 'http://localhost:8000';
-    }
-  }
+export type MeResponse = {
+  uid: string;
+  email?: string | null;
+  credits: number;
+};
 
-  // 明示設定があれば尊重（本番はここを使う）
-  if (process.env.NEXT_PUBLIC_API_BASE_URL && process.env.NEXT_PUBLIC_API_BASE_URL.trim()) {
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
-  }
+export type ChargeLog = {
+  id: string;
+  price_id: string | null;
+  quantity: number;
+  credits_added: number;
+  amount_total_jpy: number;
+  currency: string;
+  created_at: string;
+};
 
-  // ブラウザ: 同一オリジン（CDN/Edge配下のリバースプロキシ前提）
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}`;
-  }
+export type ConsumptionLog = {
+  id: number;
+  credits_used: number;
+  reason: string | null;
+  request_id: string | null;
+  refunded: boolean;
+  created_at: string;
+};
 
-  // SSR時のフォールバック（開発）
-  return 'http://localhost:8000';
+export type HistoryResponse = {
+  charges: ChargeLog[];
+  consumptions: ConsumptionLog[];
+};
+
+export type CheckoutSessionResponse = {
+  url: string;
+};
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || 'http://localhost:8000';
+
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
 }
-
-const DEFAULT_BASE_URL = resolveBaseUrl();
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const message = await response.text();
-    throw new Error(message || 'サーバーでエラーが発生しました。');
+    throw new ApiError(message || 'サーバーでエラーが発生しました。', response.status);
   }
   return response.json() as Promise<T>;
 }
 
-export async function requestEdit(payload: EditRequestPayload): Promise<EditResponse> {
-  const response = await fetch(`${DEFAULT_BASE_URL}/api/edit`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
+type FetchOptions = {
+  method?: 'GET' | 'POST';
+  body?: unknown;
+  idToken?: string | null;
+};
+
+async function fetchWithAuth<T>(path: string, options: FetchOptions = {}): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+
+  if (options.idToken) {
+    headers.Authorization = `Bearer ${options.idToken}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: options.method ?? 'GET',
+    headers,
+    body: options.body ? JSON.stringify(options.body) : undefined
   });
 
-  return handleResponse<EditResponse>(response);
+  return handleResponse<T>(response);
 }
 
-export async function pollResult(requestId: string): Promise<PollResponse> {
-  const response = await fetch(`${DEFAULT_BASE_URL}/api/poll?request_id=${encodeURIComponent(requestId)}`);
-  return handleResponse<PollResponse>(response);
+export function pollResult(requestId: string): Promise<PollResponse> {
+  return fetchWithAuth<PollResponse>(`/api/poll?request_id=${encodeURIComponent(requestId)}`, {
+    method: 'GET'
+  });
+}
+
+export function generateImage(payload: EditRequestPayload, idToken: string): Promise<EditResponse> {
+  return fetchWithAuth<EditResponse>('/api/generate', {
+    method: 'POST',
+    body: payload,
+    idToken
+  });
+}
+
+export function createCheckoutSession(
+  priceId: string,
+  quantity: number,
+  idToken: string
+): Promise<CheckoutSessionResponse> {
+  return fetchWithAuth<CheckoutSessionResponse>('/api/payment/create-checkout-session', {
+    method: 'POST',
+    body: { price_id: priceId, quantity },
+    idToken
+  });
+}
+
+export function fetchMe(idToken: string): Promise<MeResponse> {
+  return fetchWithAuth<MeResponse>('/api/me', { method: 'GET', idToken });
+}
+
+export function fetchHistory(idToken: string): Promise<HistoryResponse> {
+  return fetchWithAuth<HistoryResponse>('/api/me/history', { method: 'GET', idToken });
 }
