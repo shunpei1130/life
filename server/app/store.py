@@ -14,14 +14,15 @@ class InMemoryJobStore:
     self._lock = Lock()
     self._jobs_by_request: Dict[str, Job] = {}
 
-  def create_job(self, filename: str, prompt: str) -> Job:
+  def create_job(self, filename: str, prompt: str, uid: str | None = None) -> Job:
     job_id = uuid4().hex
     job = Job(
       id=job_id,
       status=JobStatus.PROCESSING,
       created_at=datetime.utcnow(),
       original_filename=filename,
-      prompt=prompt
+      prompt=prompt,
+      uid=uid,
     )
     with self._lock:
       self._jobs[job_id] = job

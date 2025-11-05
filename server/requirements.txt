@@ -2,3 +2,7 @@ fastapi==0.110.0
 uvicorn[standard]==0.29.0
 httpx==0.27.0
 pydantic==1.10.15
+stripe==10.4.0
+firebase-admin==6.5.0
+SQLAlchemy==2.0.29
+psycopg2-binary==2.9.9
